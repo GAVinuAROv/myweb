@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>මගේ සිහින දේශය කරා වූ ගමන - Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    
+    <style>
+        :root {
+            --primary-color: #3498db; /* නිල් පැහැය */
+            --secondary-color: #2ecc71; /* කොළ පැහැය */
+            --background-color: #ecf0f1; /* ලා අළු පසුබිම */
+            --card-background: #ffffff; /* සුදු කාඩ් පසුබිම */
+            --text-color: #2c3e50; /* තද අළු අකුරු */
+            --border-color: #bdc3c7; /* අළු මායිම් */
+            --shadow-color: rgba(0, 0, 0, 0.15); /* සෙවනැලි */
+            --accent-color: #e74c3c; /* අවධාරණය කිරීමට රතු */
+            --highlight-color: #f39c12; /* Highlight කිරීමට තැඹිලි */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden; /* තිරයෙන් පිටත යන දේවල් සැඟවීමට */
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* තිරයේ ප්‍රමාණය අනුව තීරු සකස් කිරීමට */
+            gap: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            grid-column: 1 / -1; /* Header එක සම්පූර්ණ පළලට */
+            box-shadow: 0 3px 6px var(--shadow-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            font-weight: bold;
+        }
+
+        .section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            font-size: 1.8em;
+        }
+
+        /* Specific Section Layouts */
+        .core-goals, .action-plan, .migration-roadmap, .motivation-vision {
+            grid-column: span 2; /* මේ කොටස් ටිකක් ලොකුවට පෙන්වීමට */
+        }
+
+        .highlights {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .urgent-highlight {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .image-placeholder, .diagram-container {
+            width: 100%;
+            min-height: 150px; /* අවම උසක් දෙන්න */
+            background-color: var(--background-color);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            margin: 15px 0;
+            border-radius: 5px;
+            font-style: italic;
+            text-align: center;
+            overflow: hidden; /* Diagrams/Images කොටුවෙන් පිටතට නොයන ලෙස */
+            padding: 10px; /* ඇතුළත ඉඩක් */
+        }
+
+        .image-placeholder img, .diagram-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* රූපය/Diagram එක Placeholder එක තුළට සකස් කිරීමට */
+        }
+
+        .chart-container {
+            width: 100%;
+            min-height: 200px; /* Chart සඳහා අවම උසක් */
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .quote {
+            font-style: italic;
+            margin: 15px 0;
+            padding: 10px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #e9f5f2; /* Quotes සඳහා වෙනස් පසුබිමක් */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            grid-column: 1 / -1; /* Footer එක සම්පූර්ණ පළලට */
+            box-shadow: 0 -3px 6px var(--shadow-color);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr; /* කුඩා තිර වලදී තීරු 1කට සකස් කිරීමට */
+                padding: 0 15px;
+            }
+
+            .core-goals, .action-plan, .migration-roadmap, .motivation-vision {
+                grid-column: span 1;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>මගේ සිහින දේශය කරා වූ ගමන: QS සහ විගමන සැලසුම</h1>
+    </header>
+
+    <div class="dashboard-container">
+
+        <section class="section core-goals">
+            <h2>මගේ ප්‍රධාන ඉලක්ක (Core Goals)</h2>
+            <p>මෙය මාගේ ජීවිතයේ ප්‍රධාන හැරවුම් ලක්ෂ්‍යයයි. මාගේ සහ මාගේ ආදරණීය පවුලේ අනාගතය වෙනුවෙන් මා සපුරාගත යුතු ප්‍රධාන ඉලක්ක වන්නේ:</p>
+            <ul>
+                <li><span class="highlights">QS Degree සම්පූර්ණ කිරීම</span></li>
+                <li><span class="highlights">IELTS විභාගයෙන් 7+ ක ප්‍රවීණතා මට්ටමක් ලබා ගැනීම</span></li>
+                <li><span class="highlights">පවුලක් ලෙස අප බලාපොරොත්තු වන සිහින දේශයට සාර්ථකව විගමනය වීම</span></li>
+            </ul>
+            <div class="image-placeholder">
+                <img src="/api/placeholder/400/300" alt="පවුලේ ඡායාරූපය">
+                <p>ඉලක්ක නිරූපණය කරන Icon/Image සඳහා ස්ථානය</p>
+            </div>
+            <p>මෙම ඉලක්ක අපගේ ගමනේ මූලික අරමුණු වන අතර, සෑම දිනකම මේවා සිහිපත් කරමින් ඉදිරියට යාම වැදගත් වේ.</p>
+        </section>
+
+        <section class="section">
+            <h2>මගේ ශක්තීන් සහ අඩිතාලම (My Strengths & Foundation)</h2>
+            <p>මෙම අභියෝගාත්මක ගමන සාර්ථකව නිම කිරීමට මට ඇති ශක්තීන් සහ දැනටමත් ගොඩනගා ගත් අඩිතාලම:</p>
+            <ul>
+                <li><span class="highlights">අධ්‍යාපන සුදුසුකම්:</span> IVQ Level 5, NCT Level 5, සහ දැනට හදාරන QS Degree.</li>
+                <li><span class="highlights">රැකියා පළපුරුද්ද:</span> අදාළ ක්ෂේත්‍රයේ වසර 12+ ක පුළුල් පළපුරුද්ද (Service Letters ඇත).</li>
+                <li><span class="urgent-highlight">වැදගත් මතක් කිරීම:</span> මාලදිවයිනෙන් ලබාගත යුතු රැකියා පළපුරුද්දට අදාළ ලිපිය.</li>
+            </ul>
+            <div class="diagram-container">
+                <p>රැකියා පළපුරුද්ද කාලරේඛාව</p>
+                <div class="mermaid">
+timeline
+    title රැකියා පළපුරුද්ද කාලරේඛාව
+    section පළමු රැකියාව
+        2012-2015: තනතුර 1
+        2015-2018: තනතුර 2
+    section මාලදිවයින්
+        2018-2024: තනතුර 3 (මාලදිවයින)
+    section වර්තමාන
+        2024-වර්තමානය: තනතුර 4 (ශ්‍රී ලංකාව)
+                </div>
+            </div>
+            <p><span class="highlights">AI සහ Technology හැකියාවන්:</span> Overleaf, Gamma, Mermaid, Draw.io, Napkin, I Love PDF, GitHub වැනි නවීන Tools සහ Gemini, ChatGPT, Perplexity, Deepsheek වැනි AI Chatbots භාවිතයේ ප්‍රවීණතාවය. මෙම හැකියාවන් මගේ අධ්‍යයන කටයුතු, පර්යේෂණ, සහ දෛනික සැලසුම් ක්‍රියාත්මක කිරීමට ප්‍රබල සහයෝගයක් සපයයි.</p>
+        </section>
+
+        <section class="section">
+            <h2>මගේ බිරිඳගේ පසුබිම සහ සැලසුම (My Wife's Background and Plan)</h2>
+            <p>මෙම ගමනේදී මාගේ ආදරණීය බිරිඳගේ සහයෝගය සහ දායකත්වය අතිශයින් වැදගත්ය. ඇයගේ පසුබිම සහ අපගේ විගමන සැලසුමේ ඇයගේ කොටස:</p>
+            <ul>
+                <li>[බිරිඳගේ අධ්‍යාපන/වෘත්තීය පසුබිම මෙහි සඳහන් කරන්න].</li>
+                <li>ඇයගේ සැලසුම (Nursing Path එකට අදාළව) මෙහි කෙටියෙන් විස්තර කරන්න.</li>
+            </ul>
+            <div class="image-placeholder">
+                <img src="/api/placeholder/300/300" alt="බිරිඳගේ ඡායාරූපය">
+                <p>බිරිඳගේ Picture/Icon සඳහා ස්ථානය</p>
+            </div>
+            <p>අප දෙදෙනා එක්ව මෙම ඉලක්කය කරා ගමන් කිරීම මෙම සැලසුමේ ප්‍රධාන ශක්තියකි.</p>
+        </section>
+
+        <section class="section action-plan">
+            <h2>මගේ ක්‍රියාකාරී සැලසුම (The Action Plan)</h2>
+            <p>අපගේ ඉලක්ක කරා ළඟා වීම සඳහා දිනපතා සහ සතිපතා අනුගමනය කරන ක්‍රියාකාරී සැලසුම මෙහි දැක්වේ:</p>
+
+            <h3>දෛනික කාලසටහන:</h3>
+            <div class="diagram-container">
+                <p>දෛනික කාලසටහන Diagram</p>
+                <div class="mermaid">
+flowchart TD
+    A[උදෑසන අවදි වීම] --> B(අධ්‍යයන කටයුතු)
+    B --> C{රැකියා වේලාව?}
+    C -- ඔව් --> D[රැකියාවට යාම]
+    C -- නැහැ --> E[වැඩිදුර අධ්‍යයන/IELTS]
+    D --> F{සවස}
+    E --> F
+    F --> G(පවුලට කාලය)
+    G --> H(රාත්‍රී ආහාරය)
+    H --> I(සුළු අධ්‍යයන/වෙනත් කටයුතු)
+    I --> J[නින්දට යාම]
+                </div>
+            </div>
+            <p>උදෑසනින් අවදි වී, අධ්‍යාපන කටයුතු සඳහා කාලය වෙන් කිරීම, රැකියා කටයුතු සමබරව පවත්වා ගැනීම සහ පවුලට කාලය දීම මෙම දෛනික සැලසුමේ ප්‍රධාන අංග වේ.</p>
+
+            <h3>මාස 3 අධ්‍යයන සැලසුම (සති 12 සැලසුම):</h3>
+            <p>ඉදිරි මාස 3 සඳහා අධ්‍යයන කටයුතු වල ප්‍රධාන අවධානයන්:</p>
+            <ul>
+                <li><span class="highlights">QSP සහ IGP Modules</span></li>
+                <li><span class="highlights">IELTS විභාගයේ Modules 4ම (Listening, Reading, Writing, Speaking)</span></li>
+                <li><span class="highlights">Research Project එකේ පියවරයන් සම්පූර්ණ කිරීම</span></li>
+            </ul>
+            <div class="diagram-container">
+                <p>සති 12 අධ්‍යයන සැලසුමේ ප්‍රධාන අවධානයන්</p>
+                <div class="mermaid">
+gantt
+    title සති 12 අධ්‍යයන සැලසුම
+    dateFormat  YYYY-MM-DD
+    section QS Degree
+    QSP Module :a1, 2025-04-26, 30d
+    IGP Module :a2, after a1, 30d
+    Research Project :a3, 2025-04-26, 90d
+    section IELTS
+    Reading & Listening :b1, 2025-04-26, 30d
+    Writing :b2, after b1, 30d
+    Speaking :b3, 2025-04-26, 60d
+    Mock Tests :b4, after b2, 30d
+                </div>
+            </div>
+
+            <h3>Assignment සහ Research Project:</h3>
+            <ul>
+                <li><span class="urgent-highlight">Deadlines:</span> 2026 ජනවාරි මස</li>
+                <li>Research Project එකේ ප්‍රධාන පියවර: Literature Review, Methodology, Data Collection, Analysis, Report Writing.</li>
+            </ul>
+            <div class="chart-container">
+                <canvas id="researchProgressChart"></canvas>
+                <p style="text-align: center; font-style: normal;">Research Project ප්‍රගතිය (Chart)</p>
+            </div>
+
+            <h3>IELTS සූදානම:</h3>
+            <p>IELTS Modules 4ම සඳහා දිනපතා හෝ සතිපතා පුහුණු වීම් සිදු කිරීම. Mock Tests වලට සහභාගී වීම.</p>
+            <div class="chart-container">
+                <canvas id="ieltsScoreChart"></canvas>
+                <p style="text-align: center; font-style: normal;">IELTS Score ප්‍රගතිය (Chart)</p>
+            </div>
+
+            <h3>AI භාවිතය (මෙම සැලසුම ක්‍රියාත්මක කිරීමට):</h3>
+            <p>මාගේ දෛනික/සතිපතා ඉලක්ක AI (Gemini) වෙත ලබා දීම. ප්‍රගතිය පිළිබඳව AI සමඟ සාකච්ඡා කිරීම සහ අවශ්‍ය විට Follow Up කිරීම. AI මගින් කාලසටහන් සකස් කිරීමට, අන්තර්ගතය ලිවීමට, අදහස් ලබා ගැනීමට සහ දිරිගැන්වීම් ලබා ගැනීමට උපරිමයෙන් භාවිත කිරීම. මෙම Dashboard එක AI සමඟ ඇති සම්බන්ධීකරණයේ මූලික පදනමයි.</p>
+        </section>
+
+        <section class="section migration-roadmap">
+            <h2>විගමන සිතියම (Migration Roadmap)</h2>
+            <p>අපගේ සිහින දේශය කරා වූ ගමනේ ප්‍රධාන මාර්ග සහ සන්ධිස්ථාන:</p>
+
+            <h3>ප්‍රධාන මාර්ග:</h3>
+            <p>අප ප්‍රධාන මාර්ග 2ක් ඔස්සේ ඉදිරියට ගමන් කිරීමට සැලසුම් කර ඇත:</p>
+            <ul>
+                <li><span class="highlights">මගේ QS Path එක:</span> මගේ QS Degree සහ රැකියා පළපුරුද්ද මත පදනම්ව.</li>
+                <li><span class="highlights">බිරිඳගේ Nursing Path එක:</span> ඇයගේ සුදුසුකම් සහ අදාළ රටවල Nursing සඳහා ඇති ඉල්ලුම මත පදනම්ව. <span class="highlights">(Nursing Path එකෙහි ඇති ප්‍රබලත්වය සහ අවස්ථා ඉතා ඉහළයි.)</span></li>
+            </ul>
+
+            <h3>කඩිනම් පියවර (Urgent Steps):</h3>
+            <p>මේ දිනවල අපගේ ප්‍රමුඛතාවය විය යුතු කඩිනම් පියවර:</p>
+            <ul>
+                <li><span class="urgent-highlight">මගේ IELTS විභාගය සාර්ථක කර ගැනීම (Overall 7+, Each 6.5+ ඉලක්කය).</span></li>
+                <li><span class="urgent-highlight">මාලදිවයිනෙන් අවශ්‍ය රැකියා පළපුරුද්දට අදාළ ලිපිය ලබා ගැනීම.</span></li>
+                <li><span class="urgent-highlight">බිරිඳගේ IELTS සූදානම සහ අදාළ රටේ Nursing Registration Research කටයුතු ආරම්භ කිරීම.</span></li>
+            </ul>
+
+            <h3>ඉදිරි පියවර (Future Steps):</h3>
+            <p>කඩිනම් පියවර සම්පූර්ණ කළ පසු අපගේ ඊළඟ ප්‍රධාන සන්ධිස්ථාන:</p>
+            <ul>
+                <li>QS Degree සම්පූර්ණ කිරීම.</li>
+                <li>Skills Assessment සඳහා සූදානම් වීම සහ අයදුම් කිරීම.</li>
+                <li>අදාළ රටට අනුකූලව නිල විගමන අයදුම්පත් ඉදිරිපත් කිරීම.</li>
+                <li>වෙනත් අවශ්‍යතා (Medicals, Police Clearances ආදිය සම්පූර්ණ කිරීම).</li>
+            </ul>
+            <div class="diagram-container">
+                <p>Migration Roadmap Diagram</p>
+                <div class="mermaid">
+flowchart LR
+    A[IELTS ලබා ගැනීම] --> B[QS Degree සම්පූර්ණ කිරීම]
+    A --> C[මාලදිවයින් රැකියා සහතික]
+    B --> D[Skills Assessment]
+    C --> D
+    D --> E[EOI ඉදිරිපත් කිරීම]
+    E --> F[Visa අයදුම්පත]
+    F --> G[Medical, Police Clearance]
+    G --> H[Visa ප්‍රදානය]
+    H --> I[Resignation & ගමන් සැලසුම්]
+    I --> J[විගමනය]
+                </div>
+            </div>
+        </section>
+
+        <section class="section motivation-vision">
+            <h2>Motivation සහ ඉදිරි දැක්ම (Motivation & Vision)</h2>
+            <p>මෙම ගමනේදී අපව දිරිමත් කරන සහ අපගේ අනාගතය පිළිබඳ දැක්ම:</p>
+
+            <h3>මටම වූ දිරිගැන්වීමක්:</h3>
+            <p>මාගේ ආදරණීය බිරිඳට ලියූ ලිපියේ අදහස් සිහිපත් කරමින්, මෙම ගමන අභියෝගාත්මක වුවද, අපගේ කැපවීම, උත්සාහය සහ එකිනෙකාට ඇති ආදරය තුළින් මෙය අනිවාර්යයෙන්ම කළ හැකි බවට මා මටම පොරොන්දු වෙමි. පසුබට නොවී, වැටුණු තැනින් නැගිටිමින් ඉදිරියටම යාම මාගේ අදිටනයි. මා හට මෙම හැකියාව ඇත!</p>
+
+            <h3>අපගේ අරමුණ:</h3>
+            <div class="image-placeholder">
+                <img src="/api/placeholder/400/300" alt="අපගේ අරමුණ">
+                <p>අපගේ අරමුණ සිහිපත් කරන පවුලේ ඡායාරූපය</p>
+            </div>
+            <p>මෙම මහන්සිය සහ කැපවීම අපගේ දරුවන්ගේ සහ බිරිඳගේ සතුට, ආරක්ෂාව සහ සුරක්ෂිත අනාගතය වෙනුවෙනි. ඔවුන්ගේ සිනහව මට ලැබෙන ලොකුම දිරිගැන්වීමයි. අපගේ සිහින දේශයේ නිදහස්, සාමකාමී ජීවිතයක් අප බලාපොරොත්තු වේ.</p>
+
+            <h3>සාර්ථකත්වයේ පුළුල් අරුත:</h3>
+            <p>අපගේ ගමනේ සාර්ථකත්වය යනු හොඳ රැකියාවක් සහ ආදායමක් පමණක් නොවේ. එය පවුලේ සතුට, මානසික සහ ශාරීරික සෞඛ්‍යය, අඛණ්ඩව අලුත් දේවල් ඉගෙනීමට සහ දියුණු වීමට ඇති අවස්ථා, සහ අපගේ දරුවන්ට වඩා හොඳ අධ්‍යාපනයක් සහ අනාගතයක් ලබා දීමයි.</p>
+
+            <h3>ප්‍රියතම දිරිගන්වන සටන් පාඨ (Quotes):</h3>
+            <div class="quote">
+                <p>"The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt</p>
+            </div>
+            <div class="quote">
+                <p>"The only way to do great work is to love what you do." - Steve Jobs</p>
+            </div>
+            <div class="quote">
+                <p>"Believe you can and you're halfway there." - Theodore Roosevelt</p>
+            </div>
+            <p>මෙවැනි දිරිගන්වන සටන් පාඨ කියවීම මගින් මගේ අධිෂ්ඨානය තව තවත් ශක්තිමත් වේ.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025. සියලු හිමිකම් ඇවිරිණි.</p>
+        <p>අවසන් වරට යාවත්කාලීන කරන ලදී: අප්‍රේල් 26, 2025</p>
+    </footer>
+
+    <script>
+        // අනාගතයේදී Interactive features (Progress Bars, Checklists) සඳහා JavaScript code එකතු කිරීමට මෙම Script Tag එක භාවිතා කරන්න.
+        // Library Initialization and Chart Data මෙතනට එකතු කරන්න.
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('QS and Emigration Dashboard Loaded!');
+            
+            // --- Chart.js Charts Initialization ---
+
+            // Research Project Progress Chart
+            var researchCtx = document.getElementById('researchProgressChart').getContext('2d');
+            var researchProgressChart = new Chart(researchCtx, {
+                type: 'bar',
+                data
